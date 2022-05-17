@@ -7,7 +7,7 @@ import java.lang.StringBuilder
  * An enumeration for the types of [cells][Cell] in a [Maze].
  */
 enum class CellType {
-    POTION, GOLD, EMPTY, HOME, DOOR, ORIGIN, WALL
+    OBSTACLES, EMPTY, ORIGIN, WALL, CHEST, KEY
 }
 
 /**
@@ -45,17 +45,17 @@ class Maze(diagram: Array<String>) {
     /**
      * The positions of the enemies.
      */
-    val enemyOrigins: List<Position>
-        get() = enemies
+    val obstaclesOrigins: List<Position>
+        get() = obstacles
 
-    private val enemies = ArrayList<Position>()
+    private val obstacles = ArrayList<Position>()
+
 
     /**
      * The total gold
      */
 
-    var gold = 0
-        private set
+
 
     /**
      * The number of rows of the maze.
@@ -119,10 +119,9 @@ class Maze(diagram: Array<String>) {
                 cells[row][col] = Cell(
                     when (current[col]) {
                         ORIGIN -> CellType.ORIGIN.also { origin = Position(row, col) }
-                        POTION -> CellType.POTION
-                        HOME -> CellType.HOME.also { enemies.add(Position(row, col)) }
-                        DOOR -> CellType.DOOR
-                        GOLD -> CellType.GOLD.also { gold++ }
+                        OBSTACLES -> CellType.OBSTACLES.also {obstacles.add(Position(row, col))}
+                        KEY -> CellType.KEY
+                        CHEST -> CellType.CHEST
                         WALL -> CellType.WALL
                         else -> CellType.EMPTY
                     },
@@ -140,10 +139,19 @@ class Maze(diagram: Array<String>) {
      */
     operator fun get(position: Position): Cell = cells[position.row][position.col]
 
+
+    operator fun set(position: Position, newPosition: Position) {
+        var aux = cells[position.row][position.col]
+        cells[position.row][position.col] = cells[newPosition.row][newPosition.col]
+        cells[newPosition.row][newPosition.col] = aux
+
+    }
     /**
      * The cell at the given [row] and [col].
      */
     operator fun get(row: Int, col: Int): Cell = cells[row][col]
+
+
 
     /**
      * The representation of the [Maze] as a [String].
@@ -156,13 +164,12 @@ class Maze(diagram: Array<String>) {
                     position.col = col
                     append(
                         when (cells[row][col].type) {
-                            CellType.POTION -> POTION
-                            CellType.GOLD -> GOLD
+                            CellType.OBSTACLES -> OBSTACLES
                             CellType.EMPTY -> EMPTY
-                            CellType.HOME -> HOME
-                            CellType.DOOR -> DOOR
                             CellType.ORIGIN -> ORIGIN
                             CellType.WALL -> WALL
+                            CellType.CHEST -> CHEST
+                            CellType.KEY -> KEY
                         }
                     )
                 }
@@ -200,6 +207,23 @@ class Maze(diagram: Array<String>) {
                 cell.used = false
     }
 
+    fun canMove(position: Position, direction: Direction): Boolean {
+        val nextCell= position.translate(direction)
+        val secondNext = nextCell.translate(direction)
+        when(get(nextCell).type){
+            CellType.OBSTACLES -> {
+                if(get(secondNext).type == CellType.EMPTY)
+                    set(nextCell, secondNext)
+                return false
+            }
+            CellType.EMPTY -> return true
+            CellType.ORIGIN -> return true
+            CellType.WALL -> return false
+            CellType.CHEST -> return false
+            CellType.KEY -> return true
+        }
+    }
+
     companion object {
         /**
          * The [char] used for representing the origin.
@@ -209,32 +233,23 @@ class Maze(diagram: Array<String>) {
         /**
          * The [char] used for representing the potions.
          */
-        const val POTION = 'P'
+        const val OBSTACLES = 'R'
 
         /**
          * The [char] used for representing the walls.
          */
         const val WALL = '#'
 
-        /**
-         * The [char] used for representing the home places for enemies.
-         */
-        const val HOME = 'H'
-
-        /**
-         * The [char] used for representing the gold coins.
-         */
-        const val GOLD = '.'
 
         /**
          * The [char] used for representing empty cells.
          */
         const val EMPTY = ' '
 
-        /**
-         * The [char] used for representing the door.
-         */
-        const val DOOR = 'D'
+        const val CHEST = 'C'
+
+        const val KEY = 'K'
+
 
     }
 }

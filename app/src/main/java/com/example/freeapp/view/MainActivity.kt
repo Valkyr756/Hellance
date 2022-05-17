@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import com.example.freeapp.controller.Controller
+import com.example.freeapp.model.CellType
 import com.example.freeapp.model.Model
 import es.uji.vj1229.framework.GameActivity
 import es.uji.vj1229.framework.Graphics
@@ -43,6 +44,8 @@ class MainActivity :  GameActivity(), IMainView {
     override fun onBitmapMeasuresAvailable(width: Int, height: Int) {
         this.width = width
         this.height = height
+
+        standardSizeCalculation()
     }
 
     override fun standardSizeCalculation() {
@@ -53,9 +56,84 @@ class MainActivity :  GameActivity(), IMainView {
         graphics = Graphics(width, height)
     }
 
+    private fun rowToY(row: Int): Float = yOffset + row * standardSize
+
+    private fun colToX(col: Int): Float = xOffset + col * standardSize
+
+    private fun mazeXToScreenX(coordX: Float): Float = xOffset + coordX * standardSize
+
+    private fun mazeYToScreenY(coordY: Float): Float = yOffset + coordY * standardSize
+
+
     override fun onDrawingRequested(): Bitmap {
         graphics.clear(BACKGROUND_COLOR)
+        drawMaze()
+        drawCharacter()
 
         return graphics.frameBuffer
     }
+
+    override fun drawMaze() {
+        for (row in 0 until mazeRows) {
+            for (col in 0 until mazeCols) {
+                val cell = maze[row, col]
+                when (cell.type) {
+
+                    CellType.WALL -> graphics.drawRect(
+                        colToX(col),
+                        rowToY(row),
+                        standardSize,
+                        standardSize,
+                        Color.BLUE
+                    )
+                    CellType.OBSTACLES ->
+                    {
+                                 graphics.drawRect(
+                                colToX(col),
+                                rowToY(row),
+                                standardSize / 1.25f,
+                                standardSize / 1.25f,
+                                Color.RED
+                            )
+
+                        }
+
+
+                }
+            }
+        }
+    }
+
+    override fun drawCharacter() {
+        graphics.drawCircle(
+            mazeXToScreenX(model.character.coorX),
+            mazeYToScreenY(model.character.coorY),
+            standardSize / 2.5f,
+            Color.GREEN
+        )
+    }
+
+   /* override fun drawObstacles() {
+        val arrayColors = arrayOf(Color.CYAN, Color.RED, Color.MAGENTA, Color.WHITE)
+        var i: Int = 0
+        for (obstacle in model.arrayObstacles) {
+            graphics.drawRect(
+                mazeXToScreenX(obstacle.coorX) - standardSize / 2,
+                mazeYToScreenY(obstacle.coorY) - standardSize / 2,
+                standardSize / 1.25f,
+                standardSize / 1.25f,
+                arrayColors[i]
+            )
+            i++
+        }
+    }*/
+
+    override fun normalizeX(eventX: Int): Float {
+        return eventX / width.toFloat()
+    }
+
+    override fun normalizeY(eventY: Int): Float {
+        return eventY / height.toFloat()
+    }
+
 }
