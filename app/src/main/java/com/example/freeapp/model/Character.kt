@@ -24,10 +24,27 @@ class Character(var maze: Maze) {
     }
 
     fun move(direction: Direction) {
-        if (maze[position.translate(direction)].type == CellType.CHEST && hasKey)
+        val nextPos = position.translate(direction)     //Para chekear que la posicion a la que vas a moverse tiene algo
+        if (maze[nextPos].type == CellType.CHEST && hasKey) {
             passLevel = true
+            //sonido abrir cofre
+        }
+        else if (maze[nextPos].type == CellType.OBSTACLES) {
+            //sonido roca
+            System.out.println("roca")
+        }
+        else if (maze[nextPos].type == CellType.ENEMIES) {
+            if (maze[nextPos.translate(direction)].type != CellType.EMPTY){ //Si despues del esqueleto hay una pared donde se vaya a romper
+                //sonido esqueleto rompiendose
+                System.out.println("adios señor esqueleto")
+            }
+            else{
+                //sonido esqueleto
+                System.out.println("skeletor")
+            }
+        }
 
-        else if(maze.canMove(position, direction)){
+        if(maze.canMove(position, direction)){
             position.move(direction)
             toCenter()
 
@@ -35,6 +52,7 @@ class Character(var maze: Maze) {
             if (maze[newPos].type == CellType.KEY) {
                 maze[newPos].type = CellType.EMPTY
                 hasKey = true
+                //sonido llave
             }
 
             currentMoves--
