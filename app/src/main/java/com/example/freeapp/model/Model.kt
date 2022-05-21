@@ -7,17 +7,17 @@ class Model() {
         private set
     var character: Character = Character(maze)
 
-    var arrayObstacles: ArrayList<Obstacles> = fillArrayObstacles()
+    //var arrayObstacles: ArrayList<Obstacles> = fillArrayObstacles()
 
     var mazeChanged: Boolean = false
 
-    private fun fillArrayObstacles(): ArrayList<Obstacles> {
+    /*private fun fillArrayObstacles(): ArrayList<Obstacles> {
         val arrayAux = ArrayList<Obstacles>()
         for (i in maze.obstaclesOrigins.indices) {
             arrayAux.add(Obstacles(maze, i))
         }
         return arrayAux
-    }
+    }*/
 
 
 
@@ -30,7 +30,7 @@ class Model() {
             level += 1
             maze = Levels.all[level]
             character = Character(maze)
-            arrayObstacles = fillArrayObstacles()
+            //arrayObstacles = fillArrayObstacles()
         }
     }
 

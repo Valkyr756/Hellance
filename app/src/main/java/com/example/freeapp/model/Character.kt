@@ -32,8 +32,8 @@ class Character(var maze: Maze) {
             toCenter()
 
             val newPos = position
-            if (maze[newPos].type == CellType.KEY && !maze[newPos].used) {
-                maze[newPos].used = true
+            if (maze[newPos].type == CellType.KEY) {
+                maze[newPos].type = CellType.EMPTY
                 hasKey = true
             }
 

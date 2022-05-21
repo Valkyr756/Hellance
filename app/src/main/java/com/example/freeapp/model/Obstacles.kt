@@ -1,6 +1,6 @@
 package com.example.freeapp.model
 
-class Obstacles(var maze: Maze, var nObstacles: Int) {
+/*class Obstacles(var maze: Maze, var nObstacles: Int) {
     enum class ObstacleType{
         ENEMY, ROCK
     }
@@ -20,4 +20,4 @@ class Obstacles(var maze: Maze, var nObstacles: Int) {
 
 
 
-}
+}*/

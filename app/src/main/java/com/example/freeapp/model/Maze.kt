@@ -7,13 +7,13 @@ import java.lang.StringBuilder
  * An enumeration for the types of [cells][Cell] in a [Maze].
  */
 enum class CellType {
-    OBSTACLES, EMPTY, ORIGIN, WALL, CHEST, KEY
+    OBSTACLES, EMPTY, ORIGIN, WALL, CHEST, KEY, ENEMIES
 }
 
 /**
  * A data class for representing the cells of the [Maze].
  */
-data class Cell(val type: CellType, var used: Boolean, val walls: Int) {
+data class Cell(var type: CellType, var used: Boolean, val walls: Int) {
     /**
      * Check whether there is a wall in the given [direction].
      *
@@ -45,10 +45,10 @@ class Maze(diagram: Array<String>) {
     /**
      * The positions of the enemies.
      */
-    val obstaclesOrigins: List<Position>
+    /*val obstaclesOrigins: List<Position>
         get() = obstacles
 
-    private val obstacles = ArrayList<Position>()
+    private val obstacles = ArrayList<Position>()*/
 
 
     /**
@@ -119,10 +119,11 @@ class Maze(diagram: Array<String>) {
                 cells[row][col] = Cell(
                     when (current[col]) {
                         ORIGIN -> CellType.ORIGIN.also { origin = Position(row, col) }
-                        OBSTACLES -> CellType.OBSTACLES.also {obstacles.add(Position(row, col))}
+                        OBSTACLES -> CellType.OBSTACLES//.also {obstacles.add(Position(row, col))}
                         KEY -> CellType.KEY
                         CHEST -> CellType.CHEST
                         WALL -> CellType.WALL
+                        ENEMIES -> CellType.ENEMIES
                         else -> CellType.EMPTY
                     },
                     false,
@@ -141,11 +142,11 @@ class Maze(diagram: Array<String>) {
 
 
     operator fun set(position: Position, newPosition: Position) {
-        var aux = cells[position.row][position.col]
+        val aux = cells[position.row][position.col]
         cells[position.row][position.col] = cells[newPosition.row][newPosition.col]
         cells[newPosition.row][newPosition.col] = aux
-
     }
+
     /**
      * The cell at the given [row] and [col].
      */
@@ -170,6 +171,7 @@ class Maze(diagram: Array<String>) {
                             CellType.WALL -> WALL
                             CellType.CHEST -> CHEST
                             CellType.KEY -> KEY
+                            CellType.ENEMIES -> ENEMIES
                         }
                     )
                 }
@@ -214,7 +216,7 @@ class Maze(diagram: Array<String>) {
         when(get(nextCell).type){
 
             CellType.OBSTACLES -> {
-                if(get(secondNext).type == CellType.EMPTY || (get(secondNext).type == CellType.KEY && get(secondNext).used))
+                if(get(secondNext).type == CellType.EMPTY)
                     set(nextCell, secondNext)
                 return false
             }
@@ -223,6 +225,14 @@ class Maze(diagram: Array<String>) {
             CellType.WALL -> return false
             CellType.CHEST -> return false
             CellType.KEY -> return true
+            CellType.ENEMIES -> {
+                if(get(secondNext).type == CellType.EMPTY)
+                    set(nextCell, secondNext)
+                else if (get(secondNext).type != CellType.EMPTY){
+                    cells[nextCell.row][nextCell.col].type = CellType.EMPTY
+                }
+                return false
+            }
         }
     }
 
@@ -252,6 +262,6 @@ class Maze(diagram: Array<String>) {
 
         const val KEY = 'K'
 
-
+        const val ENEMIES = 'E'
     }
 }
