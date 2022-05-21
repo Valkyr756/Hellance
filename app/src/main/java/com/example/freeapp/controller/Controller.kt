@@ -26,11 +26,11 @@ class Controller(private val model: Model, private val view: IMainView): IGameCo
         }
 
         model.update(dTime)
-/*
+
         if(model.mazeChanged) {
-            view.standardSizeCalculate()
+            view.standardSizeCalculation()
             model.mazeChanged = false
-        }*/
+        }
 
     }
 

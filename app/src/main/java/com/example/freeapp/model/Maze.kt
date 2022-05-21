@@ -208,11 +208,13 @@ class Maze(diagram: Array<String>) {
     }
 
     fun canMove(position: Position, direction: Direction): Boolean {
-        val nextCell= position.translate(direction)
+        val nextCell = position.translate(direction)
         val secondNext = nextCell.translate(direction)
+
         when(get(nextCell).type){
+
             CellType.OBSTACLES -> {
-                if(get(secondNext).type == CellType.EMPTY)
+                if(get(secondNext).type == CellType.EMPTY || (get(secondNext).type == CellType.KEY && get(secondNext).used))
                     set(nextCell, secondNext)
                 return false
             }

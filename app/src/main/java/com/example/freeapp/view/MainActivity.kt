@@ -79,26 +79,15 @@ class MainActivity :  GameActivity(), IMainView {
                 val cell = maze[row, col]
                 when (cell.type) {
 
-                    CellType.WALL -> graphics.drawRect(
-                        colToX(col),
-                        rowToY(row),
-                        standardSize,
-                        standardSize,
-                        Color.BLUE
-                    )
-                    CellType.OBSTACLES ->
-                    {
-                                 graphics.drawRect(
-                                colToX(col),
-                                rowToY(row),
-                                standardSize / 1.25f,
-                                standardSize / 1.25f,
-                                Color.RED
-                            )
+                    CellType.WALL -> graphics.drawRect(colToX(col), rowToY(row), standardSize, standardSize, Color.BLUE)
 
-                        }
+                    CellType.OBSTACLES -> graphics.drawRect(colToX(col), rowToY(row), standardSize / 1.25f, standardSize / 1.25f, Color.RED)
 
+                    CellType.KEY ->
+                        if (!maze[row, col].used)
+                            graphics.drawCircle(colToX(col) + standardSize / 2, rowToY(row) + standardSize / 2, standardSize / 4, Color.YELLOW)
 
+                    CellType.CHEST -> graphics.drawRect(colToX(col), rowToY(row), standardSize / 1.25f, standardSize / 1.25f, Color.YELLOW)
                 }
             }
         }

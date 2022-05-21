@@ -12,7 +12,8 @@ class Character(var maze: Maze) {
     var direction = Direction.UP
     var nextDirection = Direction.UP
 
-    var hasKey: Boolean = false
+    private var hasKey: Boolean = false
+    var passLevel: Boolean = false
 
     var gameOver: Boolean = false
 
@@ -23,20 +24,26 @@ class Character(var maze: Maze) {
     }
 
     fun move(direction: Direction) {
-        //COMPROBAR SI ERA LA CELDA KEY PASAR HASKEY A TRUE Y LA CELDA KEY PASA A USED
-        if(maze.canMove(position,direction)){
+        if (maze[position.translate(direction)].type == CellType.CHEST && hasKey)
+            passLevel = true
+
+        else if(maze.canMove(position, direction)){
             position.move(direction)
             toCenter()
 
-            currentMoves--
+            val newPos = position
+            if (maze[newPos].type == CellType.KEY && !maze[newPos].used) {
+                maze[newPos].used = true
+                hasKey = true
+            }
 
-            if(currentMoves<=0){
+            currentMoves--
+            if(currentMoves <= 0){
                 gameOver = true
                 System.out.println("death, moves = "+currentMoves)
             }
-
+            System.out.println(hasKey)
         }
-
     }
 
     private fun toCenter() {

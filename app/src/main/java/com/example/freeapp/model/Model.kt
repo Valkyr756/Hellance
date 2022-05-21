@@ -9,6 +9,8 @@ class Model() {
 
     var arrayObstacles: ArrayList<Obstacles> = fillArrayObstacles()
 
+    var mazeChanged: Boolean = false
+
     private fun fillArrayObstacles(): ArrayList<Obstacles> {
         val arrayAux = ArrayList<Obstacles>()
         for (i in maze.obstaclesOrigins.indices) {
@@ -23,6 +25,13 @@ class Model() {
     fun update(deltaTime: Float) {
         character.update(deltaTime)
 
+        if (character.passLevel){
+            mazeChanged = true
+            level += 1
+            maze = Levels.all[level]
+            character = Character(maze)
+            arrayObstacles = fillArrayObstacles()
+        }
     }
 
     fun move(direction: Direction) {
