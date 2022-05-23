@@ -2,8 +2,16 @@ package com.example.freeapp.model
 
 import kotlin.math.roundToInt
 
-class Character(var maze: Maze) {
-
+class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer, val model: Model) {
+    interface CharacterSoundPlayer {
+        fun playWalk()
+        fun playKey()
+        fun playDeath()
+        fun playLevelCompleted()
+        fun playPushEnemy()
+        fun playDestroyEnemy()
+        fun playPushRock()
+    }
 
     private val speed: Float = 2f
     var position = maze.origin
@@ -17,7 +25,7 @@ class Character(var maze: Maze) {
 
     var gameOver: Boolean = false
 
-    var currentMoves = 5
+    var currentMoves = 10
 
     fun update(deltaTime: Float) {
 
@@ -27,40 +35,41 @@ class Character(var maze: Maze) {
         val nextPos = position.translate(direction)     //Para chekear que la posicion a la que vas a moverse tiene algo
         if (maze[nextPos].type == CellType.CHEST && hasKey) {
             passLevel = true
-            //sonido abrir cofre
+            soundPlayer.playLevelCompleted()
         }
         else if (maze[nextPos].type == CellType.OBSTACLES) {
-            //sonido roca
-            System.out.println("roca")
+            soundPlayer.playPushRock()
         }
         else if (maze[nextPos].type == CellType.ENEMIES) {
             if (maze[nextPos.translate(direction)].type != CellType.EMPTY){ //Si despues del esqueleto hay una pared donde se vaya a romper
-                //sonido esqueleto rompiendose
-                System.out.println("adios señor esqueleto")
+                soundPlayer.playDestroyEnemy()
             }
             else{
-                //sonido esqueleto
-                System.out.println("skeletor")
+                soundPlayer.playPushEnemy()
             }
         }
 
         if(maze.canMove(position, direction)){
             position.move(direction)
             toCenter()
+            soundPlayer.playWalk()
 
             val newPos = position
             if (maze[newPos].type == CellType.KEY) {
                 maze[newPos].type = CellType.EMPTY
                 hasKey = true
-                //sonido llave
+                soundPlayer.playKey()
             }
 
             currentMoves--
             if(currentMoves <= 0){
+                currentMoves = 5
                 gameOver = true
+                soundPlayer.playDeath()
+                position = maze.origin
+                maze.reset()
                 System.out.println("death, moves = "+currentMoves)
             }
-            System.out.println(hasKey)
         }
     }
 

@@ -1,11 +1,12 @@
 package com.example.freeapp.model
 
-class Model() {
+class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
 
     var level = 0
+    val ogMaze: Maze = Levels.all[level]
     var maze: Maze = Levels.all[level]
         private set
-    var character: Character = Character(maze)
+    var character: Character = Character(maze, soundPlayer, this)
 
     //var arrayObstacles: ArrayList<Obstacles> = fillArrayObstacles()
 
@@ -27,16 +28,23 @@ class Model() {
 
         if (character.passLevel){
             mazeChanged = true
-            level += 1
+            if (level == 1)
+                level = 0
+            else
+             level += 1
+
+
             maze = Levels.all[level]
-            character = Character(maze)
+            character = Character(maze, soundPlayer, this)
             //arrayObstacles = fillArrayObstacles()
         }
+    }
+
+    fun restartLevel() {
+        character = Character(ogMaze, soundPlayer, this)
     }
 
     fun move(direction: Direction) {
         character.move(direction)
     }
-
-
 }

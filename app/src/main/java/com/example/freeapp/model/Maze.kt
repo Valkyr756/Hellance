@@ -42,15 +42,19 @@ class Maze(diagram: Array<String>) {
      */
     val origin: Position
 
+    val keyOrigin: Position
     /**
      * The positions of the enemies.
      */
-    /*val obstaclesOrigins: List<Position>
+    val obstaclesOrigins: List<Position>
         get() = obstacles
 
-    private val obstacles = ArrayList<Position>()*/
+    private val obstacles = ArrayList<Position>()
 
+    val enemiesOrigins: List<Position>
+        get() = enemies
 
+    private val enemies = ArrayList<Position>()
     /**
      * The total gold
      */
@@ -103,6 +107,7 @@ class Maze(diagram: Array<String>) {
     init {
         cells = Array(nRows) { Array(nCols) { Cell(CellType.EMPTY, false, 0) } }
         var origin = Position(0, 0)
+        var keyOrigin = Position(0, 0)
 
         for (row in 0 until nRows) {
             val previous = diagram[if (row > 0) row - 1 else row]
@@ -119,11 +124,11 @@ class Maze(diagram: Array<String>) {
                 cells[row][col] = Cell(
                     when (current[col]) {
                         ORIGIN -> CellType.ORIGIN.also { origin = Position(row, col) }
-                        OBSTACLES -> CellType.OBSTACLES//.also {obstacles.add(Position(row, col))}
-                        KEY -> CellType.KEY
+                        OBSTACLES -> CellType.OBSTACLES.also {obstacles.add(Position(row, col))}
+                        KEY -> CellType.KEY.also { keyOrigin = Position(row, col) }
                         CHEST -> CellType.CHEST
                         WALL -> CellType.WALL
-                        ENEMIES -> CellType.ENEMIES
+                        ENEMIES -> CellType.ENEMIES.also {enemies.add(Position(row, col))}
                         else -> CellType.EMPTY
                     },
                     false,
@@ -132,6 +137,7 @@ class Maze(diagram: Array<String>) {
             }
         }
         this.origin = origin
+        this.keyOrigin = keyOrigin
         Log.i("MAZE", this.toString())
     }
 
@@ -204,9 +210,40 @@ class Maze(diagram: Array<String>) {
      * Mark all cells as not used.
      */
     fun reset() {
-        for (row in cells)
-            for (cell in row)
-                cell.used = false
+        var obstacleCreator = 0
+        var obstacleTest = 0
+        var enemyCreator = 0
+        var position: Position
+
+        for (row in 0 until nRows){
+            for (col in 0 until nCols) {
+                val cell = cells[row][col]
+                if (cell.type != CellType.WALL && cell.type != CellType.CHEST)
+                    cell.type = CellType.EMPTY
+            }
+        }
+
+        for (row in 0 until nRows){
+            for (col in 0 until nCols) {
+                position = Position(row, col)
+
+                /*if (cells[position.row][position.col].type == CellType.OBSTACLES && position != obstaclesOrigins[obstacleTest]){  //Limpia los obstaculos al haberse movido
+                    cells[position.row][position.col].type = CellType.EMPTY
+                    obstacleTest++
+                }*/
+                if (obstacleCreator < obstaclesOrigins.size && obstaclesOrigins[obstacleCreator] == position){   //Y luego los crea de vuelta en su posición original
+                    cells[position.row][position.col].type = CellType.OBSTACLES
+                    obstacleCreator++
+                }
+                else if (enemyCreator < enemiesOrigins.size && enemiesOrigins[enemyCreator] == position){   //Y luego los crea de vuelta en su posición original
+                    cells[position.row][position.col].type = CellType.ENEMIES
+                    enemyCreator++
+                }
+                else if (keyOrigin == position)
+                    cells[position.row][position.col].type = CellType.KEY
+                //cell.used = false
+            }
+        }
     }
 
     fun canMove(position: Position, direction: Direction): Boolean {

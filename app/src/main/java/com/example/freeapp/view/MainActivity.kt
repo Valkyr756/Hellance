@@ -1,17 +1,22 @@
 package com.example.freeapp.view
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.media.AudioAttributes
+import android.media.SoundPool
 import android.os.Bundle
+import com.example.freeapp.R
 import com.example.freeapp.controller.Controller
 import com.example.freeapp.model.CellType
+import com.example.freeapp.model.Character
 import com.example.freeapp.model.Model
 import es.uji.vj1229.framework.GameActivity
 import es.uji.vj1229.framework.Graphics
 import es.uji.vj1229.framework.IGameController
 import kotlin.math.min
 
-class MainActivity :  GameActivity(), IMainView {
+class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer {
 
     companion object {
         private const val BACKGROUND_COLOR = Color.GRAY
@@ -24,7 +29,17 @@ class MainActivity :  GameActivity(), IMainView {
     private var height = 0
 
     private lateinit var graphics: Graphics
-    private val model = Model()
+    private lateinit var soundPool: SoundPool
+    private var walkingId = 0
+    private var keySoundId = 0
+    private var levelCompletedSoundId = 0
+    private var characterDeathId = 0
+    private var enemyPushedSoundId = 0
+    private var pushRockSoundId = 0
+    private var destroyEnemySoundId = 0
+    //The rest of sounds
+
+    private val model = Model(this)
     private val controller = Controller(model, this)
 
     private val maze
@@ -37,6 +52,26 @@ class MainActivity :  GameActivity(), IMainView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         landscapeFullScreenOnCreate()
+        prepareSoundPool(this)
+    }
+
+    private fun prepareSoundPool(context: Context) {
+        val attributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_GAME)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        soundPool = SoundPool.Builder()
+            .setMaxStreams(3)
+            .setAudioAttributes(attributes)
+            .build()
+
+        walkingId = soundPool.load(context, R.raw.walking, 0)
+        keySoundId = soundPool.load(context, R.raw.key_sound, 0)
+        levelCompletedSoundId = soundPool.load(context, R.raw.level_completed, 0)
+        characterDeathId = soundPool.load(context, R.raw.character_death, 0)
+        enemyPushedSoundId = soundPool.load(context, R.raw.enemy_pushed, 0)
+        destroyEnemySoundId = soundPool.load(context, R.raw.destroy_enemy, 0)
+        pushRockSoundId = soundPool.load(context, R.raw.push_rock, 0)
     }
 
     override fun buildGameController() = controller
@@ -102,21 +137,6 @@ class MainActivity :  GameActivity(), IMainView {
         )
     }
 
-   /* override fun drawObstacles() {
-        val arrayColors = arrayOf(Color.CYAN, Color.RED, Color.MAGENTA, Color.WHITE)
-        var i: Int = 0
-        for (obstacle in model.arrayObstacles) {
-            graphics.drawRect(
-                mazeXToScreenX(obstacle.coorX) - standardSize / 2,
-                mazeYToScreenY(obstacle.coorY) - standardSize / 2,
-                standardSize / 1.25f,
-                standardSize / 1.25f,
-                arrayColors[i]
-            )
-            i++
-        }
-    }*/
-
     override fun normalizeX(eventX: Int): Float {
         return eventX / width.toFloat()
     }
@@ -125,4 +145,30 @@ class MainActivity :  GameActivity(), IMainView {
         return eventY / height.toFloat()
     }
 
+    override fun playWalk() {
+        soundPool.play(walkingId, 0.8f, 0.8f, 0, 0, 1f)    }
+
+    override fun playKey() {
+        soundPool.play(keySoundId, 0.8f, 0.8f, 0, 0, 1f)
+    }
+
+    override fun playDeath() {
+        soundPool.play(characterDeathId, 0.8f, 0.8f, 0, 0, 1f)
+    }
+
+    override fun playLevelCompleted() {
+        soundPool.play(levelCompletedSoundId, 0.8f, 0.8f, 0, 0, 1f)
+    }
+
+    override fun playPushEnemy() {
+        soundPool.play(enemyPushedSoundId, 0.8f, 0.8f, 0, 0, 1f)
+    }
+
+    override fun playDestroyEnemy() {
+        soundPool.play(destroyEnemySoundId, 0.8f, 0.8f, 0, 0, 1f)
+    }
+
+    override fun playPushRock() {
+        soundPool.play(pushRockSoundId, 0.8f, 0.8f, 0, 0, 1f)
+    }
 }
