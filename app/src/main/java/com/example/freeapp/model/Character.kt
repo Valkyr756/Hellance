@@ -63,11 +63,13 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer, v
 
             currentMoves--
             if(currentMoves <= 0){
-                currentMoves = 5
+                currentMoves = 10
+                hasKey = false
                 gameOver = true
                 soundPlayer.playDeath()
-                position = maze.origin
+                position = Position(2, 1)
                 maze.reset()
+                toCenter()
                 System.out.println("death, moves = "+currentMoves)
             }
         }

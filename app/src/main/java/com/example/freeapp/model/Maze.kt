@@ -41,7 +41,6 @@ class Maze(diagram: Array<String>) {
      * The [Position] of the origin.
      */
     val origin: Position
-
     val keyOrigin: Position
     /**
      * The positions of the enemies.
@@ -211,37 +210,30 @@ class Maze(diagram: Array<String>) {
      */
     fun reset() {
         var obstacleCreator = 0
-        var obstacleTest = 0
         var enemyCreator = 0
         var position: Position
 
         for (row in 0 until nRows){
             for (col in 0 until nCols) {
-                val cell = cells[row][col]
-                if (cell.type != CellType.WALL && cell.type != CellType.CHEST)
-                    cell.type = CellType.EMPTY
-            }
-        }
-
-        for (row in 0 until nRows){
-            for (col in 0 until nCols) {
                 position = Position(row, col)
-
-                /*if (cells[position.row][position.col].type == CellType.OBSTACLES && position != obstaclesOrigins[obstacleTest]){  //Limpia los obstaculos al haberse movido
+                val cell = cells[row][col]
+                /*if (cells[position.row][position.col].type == CellType.OBSTACLES && position != obstaclesOrigins[obstacleTest]){
                     cells[position.row][position.col].type = CellType.EMPTY
                     obstacleTest++
                 }*/
-                if (obstacleCreator < obstaclesOrigins.size && obstaclesOrigins[obstacleCreator] == position){   //Y luego los crea de vuelta en su posición original
-                    cells[position.row][position.col].type = CellType.OBSTACLES
+                if (cell.type != CellType.WALL && cell.type != CellType.CHEST)  //Everything empty except the ones that never move
+                    cell.type = CellType.EMPTY
+
+                if (obstacleCreator < obstaclesOrigins.size && obstaclesOrigins[obstacleCreator] == position){   //Creates the obstacles in their original positions
+                    cell.type = CellType.OBSTACLES
                     obstacleCreator++
                 }
-                else if (enemyCreator < enemiesOrigins.size && enemiesOrigins[enemyCreator] == position){   //Y luego los crea de vuelta en su posición original
-                    cells[position.row][position.col].type = CellType.ENEMIES
+                else if (enemyCreator < enemiesOrigins.size && enemiesOrigins[enemyCreator] == position){   //Same thing with the enemies
+                    cell.type = CellType.ENEMIES
                     enemyCreator++
                 }
-                else if (keyOrigin == position)
-                    cells[position.row][position.col].type = CellType.KEY
-                //cell.used = false
+                else if (keyOrigin == position) //And with the key
+                    cell.type = CellType.KEY
             }
         }
     }
