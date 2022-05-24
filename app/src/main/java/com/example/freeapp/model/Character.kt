@@ -14,7 +14,7 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
     }
 
     //private val speed: Float = 2f
-    var position = maze.origin
+    var position = Position(maze.origin)
     var coorX = position.col + 0.5f
     var coorY = position.row + 0.5f
     /*var direction = Direction.UP
@@ -67,7 +67,7 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
                 hasKey = false
                 gameOver = true
                 soundPlayer.playDeath()
-                position = Position(2, 1)
+                position = Position(maze.origin)
                 maze.reset()
                 toCenter()
             }

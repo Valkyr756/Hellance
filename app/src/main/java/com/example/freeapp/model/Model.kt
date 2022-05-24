@@ -3,7 +3,6 @@ package com.example.freeapp.model
 class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
 
     var level = 0
-    val ogMaze: Maze = Levels.all[level]
     var maze: Maze = Levels.all[level]
         private set
     var character: Character = Character(maze, soundPlayer)
