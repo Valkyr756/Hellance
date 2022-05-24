@@ -6,7 +6,7 @@ class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
     val ogMaze: Maze = Levels.all[level]
     var maze: Maze = Levels.all[level]
         private set
-    var character: Character = Character(maze, soundPlayer, this)
+    var character: Character = Character(maze, soundPlayer)
 
     //var arrayObstacles: ArrayList<Obstacles> = fillArrayObstacles()
 
@@ -35,13 +35,9 @@ class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
 
 
             maze = Levels.all[level]
-            character = Character(maze, soundPlayer, this)
+            character = Character(maze, soundPlayer)
             //arrayObstacles = fillArrayObstacles()
         }
-    }
-
-    fun restartLevel() {
-        character = Character(ogMaze, soundPlayer, this)
     }
 
     fun move(direction: Direction) {

@@ -2,7 +2,7 @@ package com.example.freeapp.model
 
 import kotlin.math.roundToInt
 
-class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer, val model: Model) {
+class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
     interface CharacterSoundPlayer {
         fun playWalk()
         fun playKey()
@@ -13,12 +13,12 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer, v
         fun playPushRock()
     }
 
-    private val speed: Float = 2f
+    //private val speed: Float = 2f
     var position = maze.origin
     var coorX = position.col + 0.5f
     var coorY = position.row + 0.5f
-    var direction = Direction.UP
-    var nextDirection = Direction.UP
+    /*var direction = Direction.UP
+    var nextDirection = Direction.UP*/
 
     private var hasKey: Boolean = false
     var passLevel: Boolean = false
@@ -70,7 +70,6 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer, v
                 position = Position(2, 1)
                 maze.reset()
                 toCenter()
-                System.out.println("death, moves = "+currentMoves)
             }
         }
     }
