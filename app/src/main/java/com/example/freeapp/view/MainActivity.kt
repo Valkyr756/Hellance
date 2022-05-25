@@ -3,6 +3,7 @@ package com.example.freeapp.view
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Paint
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.os.Bundle
@@ -10,7 +11,9 @@ import com.example.freeapp.R
 import com.example.freeapp.controller.Controller
 import com.example.freeapp.model.CellType
 import com.example.freeapp.model.Character
+import com.example.freeapp.model.Direction
 import com.example.freeapp.model.Model
+import es.uji.vj1229.framework.AnimatedBitmap
 import es.uji.vj1229.framework.GameActivity
 import es.uji.vj1229.framework.Graphics
 import es.uji.vj1229.framework.IGameController
@@ -19,7 +22,7 @@ import kotlin.math.min
 class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer {
 
     companion object {
-        private const val BACKGROUND_COLOR = Color.GRAY
+        private const val BACKGROUND_COLOR = Color.DKGRAY
     }
 
     private var xOffset = 0f
@@ -37,7 +40,7 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
     private var enemyPushedSoundId = 0
     private var pushRockSoundId = 0
     private var destroyEnemySoundId = 0
-    //The rest of sounds
+    private var animation: AnimatedBitmap? = null
 
     private val model = Model(this)
     private val controller = Controller(model, this)
@@ -81,6 +84,7 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
         this.height = height
 
         standardSizeCalculation()
+        Assets.createAssets(this, (standardSize * 1.25f).toInt())
     }
 
     override fun standardSizeCalculation() {
@@ -104,7 +108,7 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
         graphics.clear(BACKGROUND_COLOR)
         drawMaze()
         drawCharacter()
-
+        drawMovesAndPoints()
         return graphics.frameBuffer
     }
 
@@ -114,27 +118,63 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
                 val cell = maze[row, col]
                 when (cell.type) {
 
-                    CellType.WALL -> graphics.drawRect(colToX(col), rowToY(row), standardSize, standardSize, Color.BLUE)
+                    CellType.WALL -> graphics.drawBitmap(Assets.wall, colToX(col), rowToY(row))
+                        //graphics.drawRect(colToX(col), rowToY(row), standardSize, standardSize, Color.BLUE)
 
-                    CellType.OBSTACLES -> graphics.drawRect(colToX(col), rowToY(row), standardSize / 1.25f, standardSize / 1.25f, Color.RED)
+                    CellType.OBSTACLES -> graphics.drawBitmap(Assets.obstacle, colToX(col), rowToY(row))
+                        //graphics.drawRect(colToX(col), rowToY(row), standardSize / 1.25f, standardSize / 1.25f, Color.RED)
 
-                    CellType.ENEMIES -> graphics.drawRect(colToX(col), rowToY(row), standardSize / 1.25f, standardSize / 1.25f, Color.CYAN)
+                    CellType.ENEMIES -> graphics.drawBitmap(Assets.breakableObstacle, colToX(col), rowToY(row))
+                        //graphics.drawRect(colToX(col), rowToY(row), standardSize / 1.25f, standardSize / 1.25f, Color.CYAN)
 
-                    CellType.KEY -> graphics.drawCircle(colToX(col) + standardSize / 2, rowToY(row) + standardSize / 2, standardSize / 4, Color.YELLOW)
+                    CellType.KEY -> graphics.drawBitmap(Assets.key, colToX(col), rowToY(row))
+                        //graphics.drawCircle(colToX(col) + standardSize / 2, rowToY(row) + standardSize / 2, standardSize / 4, Color.YELLOW)
 
-                    CellType.CHEST -> graphics.drawRect(colToX(col), rowToY(row), standardSize / 1.25f, standardSize / 1.25f, Color.YELLOW)
+                    CellType.CHEST -> graphics.drawBitmap(Assets.chest, colToX(col), rowToY(row))
+                        //graphics.drawRect(colToX(col), rowToY(row), standardSize / 1.25f, standardSize / 1.25f, Color.YELLOW)
+
+                    CellType.TRAPS -> graphics.drawBitmap(Assets.trap, colToX(col), rowToY(row))
                 }
             }
         }
     }
 
     override fun drawCharacter() {
-        graphics.drawCircle(
+        /*graphics.drawCircle(
             mazeXToScreenX(model.character.coorX),
             mazeYToScreenY(model.character.coorY),
             standardSize / 2.5f,
             Color.GREEN
-        )
+        )*/
+        val bitmap = when (model.bitmapDirection) {
+            Direction.RIGHT -> Assets.characterRight
+            Direction.LEFT -> Assets.characterLeft
+            Direction.UP -> Assets.characterUp
+            else -> Assets.characterDown
+        }
+        graphics.drawBitmap(bitmap, mazeXToScreenX(model.character.coorX) / 1.1f, mazeYToScreenY(model.character.coorY) / 1.25f)
+    }
+
+    override fun drawMovesAndPoints() {
+        val remainingMoves = controller.getMoves()
+        val totalPoints = controller.getPoints()
+
+        graphics.setTextSize(30)
+        graphics.setTextColor(Color.WHITE)
+        graphics.setTextAlign(Paint.Align.LEFT)
+        graphics.drawText((width/32).toFloat(),(height/8).toFloat(), "Moves: $remainingMoves")
+        graphics.drawText((width/1.3).toFloat(),(height/8).toFloat(), "Points: $totalPoints")
+    }
+
+    override fun update(deltaTime: Float) {
+        animation?.update(deltaTime)
+
+        if (model.isPushAnimation){
+            animation = Assets.characterPushRightAnimated
+            model.isPushAnimation = false
+        }
+        else
+            animation = null
     }
 
     override fun normalizeX(eventX: Int): Float {

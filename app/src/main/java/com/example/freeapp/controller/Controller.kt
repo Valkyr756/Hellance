@@ -10,7 +10,7 @@ class Controller(private val model: Model, private val view: IMainView): IGameCo
 
     override fun onUpdate(deltaTime: Float, touchEvents: MutableList<TouchHandler.TouchEvent>) {
 
-        val dTime =if(deltaTime>0.5)  0.02f else deltaTime
+        val dTime = if(deltaTime>0.5)  0.02f else deltaTime
 
 
         for (event in touchEvents) {
@@ -24,14 +24,20 @@ class Controller(private val model: Model, private val view: IMainView): IGameCo
 
             }
         }
-
         model.update(dTime)
 
         if(model.mazeChanged) {
             view.standardSizeCalculation()
             model.mazeChanged = false
         }
-
+        view.update(dTime)
     }
 
+    fun getMoves(): Int {
+        return model.character.currentMoves
+    }
+
+    fun getPoints(): Int {
+        return model.points
+    }
 }

@@ -1,7 +1,5 @@
 package com.example.freeapp.model
 
-import kotlin.math.roundToInt
-
 class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
     interface CharacterSoundPlayer {
         fun playWalk()
@@ -22,16 +20,17 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
 
     private var hasKey: Boolean = false
     var passLevel: Boolean = false
-
     var gameOver: Boolean = false
-
     var currentMoves = 10
+    var animBool: Boolean = false
 
     fun update(deltaTime: Float) {
 
     }
 
     fun move(direction: Direction) {
+        animBool = false
+
         val nextPos = position.translate(direction)     //Para chekear que la posicion a la que vas a moverse tiene algo
         if (maze[nextPos].type == CellType.CHEST && hasKey) {
             passLevel = true
@@ -39,6 +38,7 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
         }
         else if (maze[nextPos].type == CellType.OBSTACLES) {
             soundPlayer.playPushRock()
+            animBool = true
         }
         else if (maze[nextPos].type == CellType.ENEMIES) {
             if (maze[nextPos.translate(direction)].type != CellType.EMPTY){ //Si despues del esqueleto hay una pared donde se vaya a romper
@@ -47,6 +47,7 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
             else{
                 soundPlayer.playPushEnemy()
             }
+            animBool = true
         }
 
         if(maze.canMove(position, direction)){
@@ -59,6 +60,9 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
                 maze[newPos].type = CellType.EMPTY
                 hasKey = true
                 soundPlayer.playKey()
+            }
+            else if (maze[newPos].type == CellType.TRAPS) {
+                currentMoves--
             }
 
             currentMoves--
@@ -78,6 +82,4 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
         coorX = position.col + 0.5f
         coorY = position.row + 0.5f
     }
-
-
 }

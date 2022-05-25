@@ -7,7 +7,7 @@ import java.lang.StringBuilder
  * An enumeration for the types of [cells][Cell] in a [Maze].
  */
 enum class CellType {
-    OBSTACLES, EMPTY, ORIGIN, WALL, CHEST, KEY, ENEMIES
+    OBSTACLES, EMPTY, ORIGIN, WALL, CHEST, KEY, ENEMIES, TRAPS
 }
 
 /**
@@ -41,25 +41,21 @@ class Maze(diagram: Array<String>) {
      * The [Position] of the origin.
      */
     val origin: Position
-    val keyOrigin: Position
+    private val keyOrigin: Position
     /**
      * The positions of the enemies.
      */
-    val obstaclesOrigins: List<Position>
+    private val obstaclesOrigins: List<Position>
         get() = obstacles
-
     private val obstacles = ArrayList<Position>()
 
-    val enemiesOrigins: List<Position>
+    private val enemiesOrigins: List<Position>
         get() = enemies
-
     private val enemies = ArrayList<Position>()
-    /**
-     * The total gold
-     */
 
-
-
+    private val trapsOrigins: List<Position>
+            get() = traps
+    private val traps = ArrayList<Position>()
     /**
      * The number of rows of the maze.
      */
@@ -128,6 +124,7 @@ class Maze(diagram: Array<String>) {
                         CHEST -> CellType.CHEST
                         WALL -> CellType.WALL
                         ENEMIES -> CellType.ENEMIES.also {enemies.add(Position(row, col))}
+                        TRAPS -> CellType.TRAPS.also {traps.add(Position(row, col))}
                         else -> CellType.EMPTY
                     },
                     false,
@@ -177,6 +174,7 @@ class Maze(diagram: Array<String>) {
                             CellType.CHEST -> CHEST
                             CellType.KEY -> KEY
                             CellType.ENEMIES -> ENEMIES
+                            CellType.TRAPS -> TRAPS
                         }
                     )
                 }
@@ -211,6 +209,7 @@ class Maze(diagram: Array<String>) {
     fun reset() {
         var obstacleCreator = 0
         var enemyCreator = 0
+        var trapCreator = 0
         var position: Position
 
         for (row in 0 until nRows){
@@ -231,6 +230,10 @@ class Maze(diagram: Array<String>) {
                 else if (enemyCreator < enemiesOrigins.size && enemiesOrigins[enemyCreator] == position){   //Same thing with the enemies
                     cell.type = CellType.ENEMIES
                     enemyCreator++
+                }
+                else if (trapCreator < trapsOrigins.size && trapsOrigins[trapCreator] == position){   //Same thing with the enemies
+                    cell.type = CellType.TRAPS
+                    trapCreator++
                 }
                 else if (keyOrigin == position) //And with the key
                     cell.type = CellType.KEY
@@ -262,6 +265,7 @@ class Maze(diagram: Array<String>) {
                 }
                 return false
             }
+            CellType.TRAPS -> return true
         }
     }
 
@@ -292,5 +296,7 @@ class Maze(diagram: Array<String>) {
         const val KEY = 'K'
 
         const val ENEMIES = 'E'
+
+        const val TRAPS = 'T'
     }
 }

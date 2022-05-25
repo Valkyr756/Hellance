@@ -6,6 +6,9 @@ class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
     var maze: Maze = Levels.all[level]
         private set
     var character: Character = Character(maze, soundPlayer)
+    var bitmapDirection: Direction = Direction.RIGHT
+    var isPushAnimation: Boolean = false
+    var points = 0
 
     //var arrayObstacles: ArrayList<Obstacles> = fillArrayObstacles()
 
@@ -32,7 +35,7 @@ class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
             else
              level += 1
 
-
+            points += character.currentMoves
             maze = Levels.all[level]
             character = Character(maze, soundPlayer)
             //arrayObstacles = fillArrayObstacles()
@@ -41,5 +44,7 @@ class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
 
     fun move(direction: Direction) {
         character.move(direction)
+        bitmapDirection = direction
+        isPushAnimation = character.animBool
     }
 }
