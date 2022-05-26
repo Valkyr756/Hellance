@@ -67,11 +67,12 @@ object Assets {
         trap = BitmapFactory.decodeResource(resource, R.drawable.trap_magical)
 
         wall?.recycle()
-        wall = BitmapFactory.decodeResource(resource, R.drawable.church_0)
+        wall = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resource, R.drawable.church_0), characterSide, characterSide, true)
         //Como escalar
 
         obstacle?.recycle()
-        obstacle = BitmapFactory.decodeResource(resource, R.drawable.tortuga)
+        obstacle = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resource, R.drawable.tortuga), characterSide, characterSide, true)
+
 
         statues?.recycle()
         statues = BitmapFactory.decodeResource(resource, R.drawable.buddhas)

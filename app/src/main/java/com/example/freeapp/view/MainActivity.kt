@@ -84,7 +84,7 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
         this.height = height
 
         standardSizeCalculation()
-        Assets.createAssets(this, (standardSize * 1.25f).toInt())
+        Assets.createAssets(this, (standardSize).toInt())
     }
 
     override fun standardSizeCalculation() {
@@ -152,7 +152,7 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
             Direction.UP -> Assets.characterUp
             else -> Assets.characterDown
         }
-        graphics.drawBitmap(bitmap, mazeXToScreenX(model.character.coorX) / 1.1f, mazeYToScreenY(model.character.coorY) / 1.25f)
+        graphics.drawBitmap(bitmap, mazeXToScreenX(model.character.coorX) - standardSize/2, mazeYToScreenY(model.character.coorY)-standardSize/2)
     }
 
     override fun drawMovesAndPoints() {
