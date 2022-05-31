@@ -12,7 +12,7 @@ object Assets {
     private const val SPRITE_CHARACTER_SIDE = 64
     private const val STANDARD_SPRITE_SIZE = 32
     private const val CHARACTER_FRAMES = 10
-    private const val PUSH_DURATION = 1f
+    private const val PUSH_DURATION = 0.5f
     private var characterSprites: Bitmap? = null
     private var character: SpriteSheet? = null
     var characterLeft: Bitmap? = null
@@ -49,7 +49,6 @@ object Assets {
             characterRight?.recycle()
             characterRight = getScaledSprite(11, 0, characterSide, characterSide)
         }
-        //Arreglar movimiento irregular
         characterPushUpAnimated?.recycle()
         characterPushUpAnimated = createAnimation(characterSide, 4)
         characterPushLeftAnimated?.recycle()
@@ -61,14 +60,13 @@ object Assets {
         //Porque no funciona
 
         key?.recycle()
-        key = BitmapFactory.decodeResource(resource, R.drawable.key)
+        key = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resource, R.drawable.key), characterSide, characterSide, true)
 
         trap?.recycle()
-        trap = BitmapFactory.decodeResource(resource, R.drawable.trap_magical)
+        trap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resource, R.drawable.trap_magical), characterSide, characterSide, true)
 
         wall?.recycle()
         wall = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resource, R.drawable.church_0), characterSide, characterSide, true)
-        //Como escalar
 
         obstacle?.recycle()
         obstacle = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resource, R.drawable.tortuga), characterSide, characterSide, true)
@@ -78,14 +76,14 @@ object Assets {
         statues = BitmapFactory.decodeResource(resource, R.drawable.buddhas)
         statuesSpriteSheet = SpriteSheet(statues, STANDARD_SPRITE_SIZE, STANDARD_SPRITE_SIZE).apply {
             breakableObstacle?.recycle()
-            breakableObstacle = getSprite(0, 0)
+            breakableObstacle = getScaledSprite(0, 0, characterSide, characterSide)
         }
 
         chests?.recycle()
         chests = BitmapFactory.decodeResource(resource, R.drawable.chest)
         chestsSpriteSheet = SpriteSheet(chests, STANDARD_SPRITE_SIZE, STANDARD_SPRITE_SIZE).apply {
             chest?.recycle()
-            chest = getSprite(0, 0)
+            chest = getScaledSprite(0, 0, characterSide, characterSide)
         }
     }
 

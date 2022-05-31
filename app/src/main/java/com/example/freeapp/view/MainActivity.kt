@@ -146,11 +146,15 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
             standardSize / 2.5f,
             Color.GREEN
         )*/
-        val bitmap = when (model.bitmapDirection) {
-            Direction.RIGHT -> Assets.characterRight
-            Direction.LEFT -> Assets.characterLeft
-            Direction.UP -> Assets.characterUp
-            else -> Assets.characterDown
+        val bitmap = if (model.isPushAnimation)
+                animation?.currentFrame
+            else {
+            when (model.bitmapDirection) {
+                Direction.RIGHT -> Assets.characterRight
+                Direction.LEFT -> Assets.characterLeft
+                Direction.UP -> Assets.characterUp
+                else -> Assets.characterDown
+            }
         }
         graphics.drawBitmap(bitmap, mazeXToScreenX(model.character.coorX) - standardSize/2, mazeYToScreenY(model.character.coorY)-standardSize/2)
     }
@@ -169,9 +173,15 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
     override fun update(deltaTime: Float) {
         animation?.update(deltaTime)
 
-        if (model.isPushAnimation){
-            animation = Assets.characterPushRightAnimated
-            model.isPushAnimation = false
+        if (model.isPushAnimation) {
+            animation = when (model.bitmapDirection) {
+                Direction.RIGHT -> Assets.characterPushRightAnimated
+                Direction.LEFT -> Assets.characterPushLeftAnimated
+                Direction.UP -> Assets.characterPushUpAnimated
+                Direction.DOWN -> Assets.characterPushDownAnimated
+            }
+            if (animation!!.isEnded)
+                model.isPushAnimation = false
         }
         else
             animation = null
