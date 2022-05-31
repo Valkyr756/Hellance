@@ -180,8 +180,10 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
                 Direction.UP -> Assets.characterPushUpAnimated
                 Direction.DOWN -> Assets.characterPushDownAnimated
             }
-            if (animation!!.isEnded)
+            if (animation!!.isEnded){
+                animation?.restart()
                 model.isPushAnimation = false
+            }
         }
         else
             animation = null
