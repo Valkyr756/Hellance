@@ -2,10 +2,10 @@ package com.example.freeapp.model
 
 class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
 
-    var level = 0
+    var level = 3
     var maze: Maze = Levels.all[level]
         private set
-    var character: Character = Character(maze, soundPlayer)
+    var character: Character = Character(maze, soundPlayer, level)
     var bitmapDirection: Direction = Direction.RIGHT
     var isPushAnimation: Boolean = false
     var points = 0
@@ -13,6 +13,7 @@ class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
     //var arrayObstacles: ArrayList<Obstacles> = fillArrayObstacles()
 
     var mazeChanged: Boolean = false
+    var isGameOver: Boolean = false
 
     /*private fun fillArrayObstacles(): ArrayList<Obstacles> {
         val arrayAux = ArrayList<Obstacles>()
@@ -30,14 +31,19 @@ class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
 
         if (character.passLevel){
             mazeChanged = true
-            if (level == 1)
-                level = 0
-            else
-             level += 1
+            level += 1
 
             points += character.currentMoves
+
+            if (level == 4) { //Ultimo nivel alcanzado
+                isGameOver = true
+                level = 0
+            }
+
             maze = Levels.all[level]
-            character = Character(maze, soundPlayer)
+            character = Character(maze, soundPlayer, level)
+
+
             //arrayObstacles = fillArrayObstacles()
         }
     }
@@ -46,5 +52,10 @@ class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
         character.move(direction)
         bitmapDirection = direction
         isPushAnimation = character.animBool
+    }
+
+    fun restartGame() {
+        points = 0
+        isGameOver = false
     }
 }

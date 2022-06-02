@@ -1,6 +1,6 @@
 package com.example.freeapp.model
 
-class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
+class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer, val level: Int) {
     interface CharacterSoundPlayer {
         fun playWalk()
         fun playKey()
@@ -21,11 +21,22 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
     private var hasKey: Boolean = false
     var passLevel: Boolean = false
     var gameOver: Boolean = false
-    var currentMoves = 10
     var animBool: Boolean = false
+
+    private val movesPerLevel = intArrayOf(28, 26, 32, 35)
+    var currentMoves = movesPerLevel[level]
+
+    init {
+        maze.reset()
+    }
 
     fun update(deltaTime: Float) {
 
+    }
+
+    private fun isStandingOnTrap(pos: Position) {   //Para descontar un movimiento si empujas algo mientras estas encima de trampa
+        if (maze[pos].type == CellType.TRAPS)
+            currentMoves--
     }
 
     fun move(direction: Direction) {
@@ -39,6 +50,8 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
         else if (maze[nextPos].type == CellType.OBSTACLES) {
             soundPlayer.playPushRock()
             animBool = true
+            currentMoves--
+            isStandingOnTrap(position)
         }
         else if (maze[nextPos].type == CellType.ENEMIES) {
             if (maze[nextPos.translate(direction)].type != CellType.EMPTY){ //Si despues del esqueleto hay una pared donde se vaya a romper
@@ -48,6 +61,8 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
                 soundPlayer.playPushEnemy()
             }
             animBool = true
+            currentMoves--
+            isStandingOnTrap(position)
         }
 
         if(maze.canMove(position, direction)){
@@ -66,15 +81,15 @@ class Character(var maze: Maze, private val soundPlayer: CharacterSoundPlayer) {
             }
 
             currentMoves--
-            if(currentMoves <= 0){
-                currentMoves = 10
-                hasKey = false
-                gameOver = true
-                soundPlayer.playDeath()
-                position = Position(maze.origin)
-                maze.reset()
-                toCenter()
-            }
+        }
+        if(currentMoves <= 0){
+            currentMoves = movesPerLevel[level]
+            hasKey = false
+            gameOver = true
+            soundPlayer.playDeath()
+            position = Position(maze.origin)
+            maze.reset()
+            toCenter()
         }
     }
 

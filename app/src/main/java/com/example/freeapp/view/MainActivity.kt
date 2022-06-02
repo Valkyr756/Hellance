@@ -28,8 +28,8 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
     private var xOffset = 0f
     private var yOffset = 0f
     private var standardSize = 0f
-    private var width = 0
-    private var height = 0
+    var width = 0
+    var height = 0
 
     private lateinit var graphics: Graphics
     private lateinit var soundPool: SoundPool
@@ -41,6 +41,8 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
     private var pushRockSoundId = 0
     private var destroyEnemySoundId = 0
     private var animation: AnimatedBitmap? = null
+
+    var isGameOverScreen = false
 
     private val model = Model(this)
     private val controller = Controller(model, this)
@@ -84,7 +86,6 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
         this.height = height
 
         standardSizeCalculation()
-        Assets.createAssets(this, (standardSize).toInt())
     }
 
     override fun standardSizeCalculation() {
@@ -93,6 +94,7 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
         yOffset = (this.height - mazeRows * standardSize) / 2
 
         graphics = Graphics(width, height)
+        Assets.createAssets(this, standardSize.toInt())
     }
 
     private fun rowToY(row: Int): Float = yOffset + row * standardSize
@@ -109,6 +111,9 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
         drawMaze()
         drawCharacter()
         drawMovesAndPoints()
+        if (isGameOverScreen)
+            drawGameOverScreen()
+        //drawRestartButton()
         return graphics.frameBuffer
     }
 
@@ -170,6 +175,26 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
         graphics.drawText((width/1.3).toFloat(),(height/8).toFloat(), "Points: $totalPoints")
     }
 
+    override fun drawGameOverScreen() {
+        graphics.clear(Color.BLACK)
+        graphics.setTextSize(80)
+        graphics.setTextAlign(Paint.Align.CENTER)
+        graphics.setTextColor(Color.WHITE)
+        graphics.drawText((width/2).toFloat(), (height/2).toFloat(), "CONGRATULATIONS!")
+        graphics.setTextSize(60)
+        graphics.drawText((width/2).toFloat(), (height/2).toFloat() + height/8, "Your score was: ${model.points}")
+        graphics.setTextColor(Color.RED)
+        graphics.drawText((width/2).toFloat(), (height/2).toFloat() + height/4, "Click to restart")
+    }
+
+    /*override fun drawRestartButton() {
+        graphics.drawRect((width/2.25).toFloat() - (width/2.4f), (height/2.5).toFloat() - height/4, (width/6).toFloat(), (height/8).toFloat(), Color.BLACK)
+        graphics.setTextSize(30)
+        graphics.setTextAlign(Paint.Align.CENTER)
+        graphics.setTextColor(Color.RED)
+        graphics.drawText((width/9.5f), (height/4.25f), "Restart")
+    }*/
+
     override fun update(deltaTime: Float) {
         animation?.update(deltaTime)
 
@@ -197,6 +222,12 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
         return eventY / height.toFloat()
     }
 
+    /*override fun restartBoxClicked(x: Float, y: Float): Boolean {
+        val originBoxX = (width/2.25).toFloat() - width/2.4f
+        val originBoxY = (height/2.5).toFloat() - height/4
+        return (x >= originBoxX && x <= originBoxX + (width/6).toFloat()) && (y >= originBoxY && y <= originBoxY + (height/8).toFloat())
+    }*/
+
     override fun playWalk() {
         soundPool.play(walkingId, 0.8f, 0.8f, 0, 0, 1f)    }
 
@@ -222,5 +253,9 @@ class MainActivity :  GameActivity(), IMainView, Character.CharacterSoundPlayer 
 
     override fun playPushRock() {
         soundPool.play(pushRockSoundId, 0.8f, 0.8f, 0, 0, 1f)
+    }
+
+    override fun changeGameOverState(stateGameOver: Boolean) {
+        isGameOverScreen = stateGameOver
     }
 }

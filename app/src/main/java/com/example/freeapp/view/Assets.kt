@@ -49,6 +49,7 @@ object Assets {
             characterRight?.recycle()
             characterRight = getScaledSprite(11, 0, characterSide, characterSide)
         }
+        //20: animacion de muerte
         characterPushUpAnimated?.recycle()
         characterPushUpAnimated = createAnimation(characterSide, 4)
         characterPushLeftAnimated?.recycle()

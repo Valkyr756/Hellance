@@ -12,16 +12,25 @@ class Controller(private val model: Model, private val view: IMainView): IGameCo
 
         val dTime = if(deltaTime>0.5)  0.02f else deltaTime
 
+        if (model.isGameOver)
+            view.changeGameOverState(true)
 
         for (event in touchEvents) {
+            val x = view.normalizeX(event.x)
+            val y = view.normalizeY(event.y)
             if (event.type == TouchHandler.TouchType.TOUCH_DOWN)
-                gestureDetector.onTouchDown(view.normalizeX(event.x), view.normalizeY(event.y))
+                gestureDetector.onTouchDown(x, y)
 
             if (event.type == TouchHandler.TouchType.TOUCH_UP) {
-                var touchUp = gestureDetector.onTouchUp(view.normalizeX(event.x), view.normalizeY(event.y))
-                if (touchUp == GestureDetector.Gestures.SWIPE)
+                var touchUp = gestureDetector.onTouchUp(x, y)
+                if (touchUp == GestureDetector.Gestures.SWIPE && !model.isGameOver)
                     model.move(gestureDetector.direction)
-
+                else if (touchUp == GestureDetector.Gestures.CLICK && model.isGameOver){
+                    view.changeGameOverState(false)
+                    model.restartGame()
+                }
+                /*else if (view.restartBoxClicked(x, y))
+                    System.out.println("hehehehhe")*/
             }
         }
         model.update(dTime)
