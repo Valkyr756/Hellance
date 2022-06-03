@@ -2,7 +2,7 @@ package com.example.freeapp.model
 
 class Model(private var soundPlayer: Character.CharacterSoundPlayer) {
 
-    var level = 3
+    var level = 0
     var maze: Maze = Levels.all[level]
         private set
     var character: Character = Character(maze, soundPlayer, level)
